@@ -165,7 +165,10 @@ function App() {
   const observer = useRef();
   const searchInputRef = useRef(null);
 
-  const API_KEY = "3c05f6a60fc649daaa63947418b61ab4";
+  // --- IMPORTANT FIX: Use environment variables for the API Key ---
+  // Vercel (and other hosts) will provide this value during the build process.
+  // Never hardcode API keys in your source code.
+  const API_KEY = import.meta.env.VITE_NEWS_API_KEY;
   const BASE_URL = 'https://newsapi.org/v2';
   const categories = ['general', 'business', 'technology', 'sports', 'health', 'science', 'entertainment'];
 
@@ -204,6 +207,13 @@ function App() {
 
   useEffect(() => {
     const fetchNews = async () => {
+      // --- IMPORTANT FIX: Check if the API key is available ---
+      if (!API_KEY) {
+        setError("News API Key is not configured. Please add it to your environment variables.");
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       if (page === 1) setNews([]);
 
@@ -240,7 +250,7 @@ function App() {
     };
 
     fetchNews();
-  }, [category, searchQuery, page]);
+  }, [category, searchQuery, page, API_KEY]); // Added API_KEY to dependency array
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -284,6 +294,24 @@ function App() {
       : [article, ...savedArticles];
     setSavedArticles(newSaved);
     localStorage.setItem('newsapp_saved', JSON.stringify(newSaved));
+  };
+
+  const handleShare = async (article) => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: article.title,
+          text: article.description,
+          url: article.url,
+        });
+      } catch (error) {
+        console.error('Error sharing:', error);
+      }
+    } else {
+      // Fallback for browsers that don't support the Web Share API
+      navigator.clipboard.writeText(article.url);
+      alert('Link copied to clipboard!');
+    }
   };
 
   const isSaved = (url) => savedArticles.some(item => item.url === url);
@@ -331,7 +359,7 @@ function App() {
       <div className={`min-h-screen transition-colors duration-500 text-gray-900 dark:text-gray-100`}>
         <AnimatePresence>
           {fullscreenArticle && (
-            <FullscreenModal fullscreenArticle={fullscreenArticle} onClose={() => setFullscreenArticle(null)} onShare={() => { }} onToggleSave={handleToggleSave} isSaved={isSaved} settings={settings} />
+            <FullscreenModal fullscreenArticle={fullscreenArticle} onClose={() => setFullscreenArticle(null)} onShare={handleShare} onToggleSave={handleToggleSave} isSaved={isSaved} settings={settings} />
           )}
           <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} settings={settings} setSettings={setSettings} />
         </AnimatePresence>
