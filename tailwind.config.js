@@ -8,10 +8,10 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: '#1E40AF',
-                'primary-focus': '#1D4ED8',
-                secondary: '#DB2777',
-                'secondary-focus': '#BE185D',
+                primary: '#3B82F6',
+                'primary-focus': '#2563EB',
+                secondary: '#EC4899',
+                'secondary-focus': '#DB2777',
                 accent: '#F59E0B',
                 'accent-focus': '#D97706',
                 neutral: '#1F2937',
