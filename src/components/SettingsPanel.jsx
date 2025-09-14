@@ -1,18 +1,22 @@
+// SettingsPanel now accepts `settings` object and `setSettings` updater to match App.jsx.
 const SettingsPanel = ({
     open,
     onClose,
-    darkMode,
-    onToggleDark,
-    compactMode,
-    onToggleCompact,
-    glassMode,
-    onToggleGlass,
-    reduceMotion,
-    onToggleReduceMotion,
-    viewMode,
-    onChangeView
+    settings,
+    setSettings,
 }) => {
     if (!open) return null
+
+    const { darkMode, compactMode, glassMode, reduceMotion, viewMode } = settings ?? {};
+
+    const toggle = (key) => setSettings(s => {
+        const next = { ...s, [key]: !s[key] };
+        return next;
+    });
+    const changeView = (mode) => setSettings(s => {
+        if (s.viewMode === mode) return s;
+        return { ...s, viewMode: mode };
+    });
     return (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
             <div className="w-full max-w-md rounded-2xl shadow-2xl border bg-white/80 dark:bg-gray-900/80 border-black/10 dark:border-white/10 backdrop-blur-xl">
@@ -23,25 +27,25 @@ const SettingsPanel = ({
                 <div className="p-5 space-y-4">
                     <label className="flex items-center justify-between gap-3">
                         <span>Dark Mode</span>
-                        <input type="checkbox" checked={darkMode} onChange={onToggleDark} className="h-5 w-5" />
+                        <input type="checkbox" checked={!!darkMode} onChange={() => toggle('darkMode')} className="h-5 w-5" />
                     </label>
                     <label className="flex items-center justify-between gap-3">
                         <span>Compact Density</span>
-                        <input type="checkbox" checked={compactMode} onChange={onToggleCompact} className="h-5 w-5" />
+                        <input type="checkbox" checked={!!compactMode} onChange={() => toggle('compactMode')} className="h-5 w-5" />
                     </label>
                     <label className="flex items-center justify-between gap-3">
                         <span>Glassy Surfaces</span>
-                        <input type="checkbox" checked={glassMode} onChange={onToggleGlass} className="h-5 w-5" />
+                        <input type="checkbox" checked={!!glassMode} onChange={() => toggle('glassMode')} className="h-5 w-5" />
                     </label>
                     <label className="flex items-center justify-between gap-3">
                         <span>Reduce Motion</span>
-                        <input type="checkbox" checked={reduceMotion} onChange={onToggleReduceMotion} className="h-5 w-5" />
+                        <input type="checkbox" checked={!!reduceMotion} onChange={() => toggle('reduceMotion')} className="h-5 w-5" />
                     </label>
                     <div className="flex items-center justify-between gap-3">
                         <span>Layout</span>
                         <div className="flex rounded-lg overflow-hidden border border-black/10 dark:border-white/10">
-                            <button aria-label="List view" onClick={() => onChangeView('list')} className={`px-3 py-2 ${viewMode === 'list' ? 'bg-primary text-white' : ''}`}>☰</button>
-                            <button aria-label="Grid view" onClick={() => onChangeView('grid')} className={`px-3 py-2 ${viewMode === 'grid' ? 'bg-primary text-white' : ''}`}>☷</button>
+                            <button aria-label="List view" onClick={() => changeView('list')} className={`px-3 py-2 ${viewMode === 'list' ? 'bg-primary text-white' : ''}`}>☰</button>
+                            <button aria-label="Grid view" onClick={() => changeView('grid')} className={`px-3 py-2 ${viewMode === 'grid' ? 'bg-primary text-white' : ''}`}>☷</button>
                         </div>
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-400 pt-2">
