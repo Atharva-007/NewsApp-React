@@ -9,13 +9,15 @@
             }
         }
     ],
-    "rewrites": [
+    "routes": [
         {
             "src": "/(.*)",
             "dest": "/index.html"
         }
     ],
-    "env": {
-        "VITE_NEWS_API_KEY": "@news-api-key"
+    "functions": {
+        "src/**": {
+            "maxDuration": 30
+        }
     }
 }
